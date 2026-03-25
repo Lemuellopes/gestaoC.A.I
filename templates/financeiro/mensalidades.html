@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+{% block title %}Mensalidades — C.A.I{% endblock %}
+{% block page_title %}Mensalidades{% endblock %}
+{% block topbar_actions %}
+<a href="{% url 'nova_mensalidade' %}" class="btn-topbar btn-primary-cai"><i class="fas fa-plus"></i> Nova</a>
+{% endblock %}
+{% block content %}
+<div class="card-cai mb-4">
+  <form method="get" class="row g-3 align-items-end">
+    <div class="col-md-2">
+      <label class="form-label fw-semibold" style="font-size:12px;">Mês</label>
+      <select name="mes" class="form-select">
+        {% for num, nome in meses_choices %}<option value="{{ num }}" {% if num == mes %}selected{% endif %}>{{ nome }}</option>{% endfor %}
+      </select>
+    </div>
+    <div class="col-md-2">
+      <label class="form-label fw-semibold" style="font-size:12px;">Ano</label>
+      <input type="number" name="ano" value="{{ ano }}" class="form-control">
+    </div>
+    <div class="col-md-2">
+      <label class="form-label fw-semibold" style="font-size:12px;">Status</label>
+      <select name="status" class="form-select">
+        <option value="">Todos</option>
+        {% for val, nome in status_choices %}<option value="{{ val }}" {% if val == status %}selected{% endif %}>{{ nome }}</option>{% endfor %}
+      </select>
+    </div>
+    <div class="col-md-4">
+      <label class="form-label fw-semibold" style="font-size:12px;">Buscar aluno</label>
+      <input type="text" name="q" value="{{ q }}" class="form-control" placeholder="Nome do aluno...">
+    </div>
+    <div class="col-md-2">
+      <button type="submit" class="btn btn-primary w-100" style="border-radius:8px;"><i class="fas fa-search"></i> Filtrar</button>
+    </div>
+  </form>
+</div>
+<div class="card-cai">
+  <div class="table-responsive">
+    <table class="table-cai">
+      <thead><tr><th>Aluno</th><th>Mês/Ano</th><th>Valor</th><th>Pago</th><th>Pendente</th><th>Vencimento</th><th>Status</th><th>Ações</th></tr></thead>
+      <tbody>
+        {% for m in mensalidades %}
+        <tr>
+          <td>
+            <a href="{% url 'perfil_aluno' m.aluno.pk %}" class="fw-semibold text-decoration-none" style="color:#2d3748;">{{ m.aluno.nome }}</a>
+            <br><code style="font-size:11px;color:#718096;">{{ m.aluno.matricula }}</code>
+          </td>
+          <td>{{ m.get_mes_display }}/{{ m.ano }}</td>
+          <td>R$ {{ m.valor_total|floatformat:2 }}</td>
+          <td class="text-success fw-semibold">R$ {{ m.valor_pago|floatformat:2 }}</td>
+          <td class="{% if m.valor_pendente > 0 %}text-danger fw-semibold{% endif %}">R$ {{ m.valor_pendente|floatformat:2 }}</td>
+          <td>
+            {{ m.data_vencimento|date:"d/m/Y" }}
+            {% if m.dias_atraso > 0 %}<br><small class="text-danger">{{ m.dias_atraso }}d atraso</small>{% endif %}
+          </td>
+          <td><span class="chip chip-{{ m.status }}">{{ m.get_status_display }}</span></td>
+          <td>
+            {% if m.status != 'paga' and m.status != 'cancelada' %}
+            <a href="{% url 'registrar_pagamento' m.pk %}" class="btn btn-sm btn-success" style="border-radius:6px;font-size:11px;">
+              <i class="fas fa-dollar-sign"></i> Pagar
+            </a>
+            {% endif %}
+          </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="8" class="text-center text-muted py-5">Nenhuma mensalidade encontrada.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

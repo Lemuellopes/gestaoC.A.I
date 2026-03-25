@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% block title %}Matricular Aluno — C.A.I{% endblock %}
+{% block page_title %}Matricular Aluno{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-6">
+    <div class="card-cai mb-3" style="background:#e8f4fd;border:1px solid #1a6fb5;">
+      <strong><i class="fas fa-layer-group me-2" style="color:#1a6fb5;"></i>{{ turma.nome }}</strong>
+      <div class="text-muted small mt-1">
+        {{ turma.get_dia_semana_display }} {{ turma.horario_inicio|time:"H:i" }} –
+        {{ turma.horario_fim|time:"H:i" }} | {{ turma.vagas_disponiveis }} vaga(s)
+      </div>
+    </div>
+    <div class="card-cai">
+      <div class="section-title"><i class="fas fa-user-plus me-2 text-primary"></i>Dados da Matrícula</div>
+      <form method="post">
+        {% csrf_token %}
+        {% for field in form %}
+        <div class="mb-3">
+          <label class="form-label fw-semibold" style="font-size:13px;">{{ field.label }}{% if field.field.required %}<span class="text-danger">*</span>{% endif %}</label>
+          {{ field }}
+          {% if field.errors %}<div class="text-danger" style="font-size:12.5px;">{% for e in field.errors %}{{ e }}{% endfor %}</div>{% endif %}
+        </div>
+        {% endfor %}
+        <div class="d-flex gap-2 mt-4">
+          <button type="submit" class="btn btn-primary px-4" style="border-radius:8px;"><i class="fas fa-check me-2"></i>Confirmar Matrícula</button>
+          <a href="{% url 'detalhe_turma' turma.pk %}" class="btn btn-outline-secondary px-4" style="border-radius:8px;">Cancelar</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
