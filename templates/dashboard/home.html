@@ -1,0 +1,247 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard — C.A.I{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+
+{% block topbar_actions %}
+<span class="text-muted" style="font-size:13px;">
+  <i class="fas fa-calendar-alt me-1"></i> {{ hoje|date:"l, d \d\e F \d\e Y" }}
+</span>
+{% endblock %}
+
+{% block extra_head %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+{% endblock %}
+
+{% block content %}
+
+<!-- KPI Row -->
+<div class="row g-3 mb-4">
+  <div class="col-sm-6 col-xl-3">
+    <div class="kpi-card">
+      <div class="kpi-icon blue"><i class="fas fa-child"></i></div>
+      <div>
+        <div class="kpi-value">{{ total_alunos }}</div>
+        <div class="kpi-label">Alunos Ativos</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-6 col-xl-3">
+    <div class="kpi-card">
+      <div class="kpi-icon teal"><i class="fas fa-chalkboard-teacher"></i></div>
+      <div>
+        <div class="kpi-value">{{ total_professores }}</div>
+        <div class="kpi-label">Instrutores Ativos</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-6 col-xl-3">
+    <div class="kpi-card">
+      <div class="kpi-icon yellow"><i class="fas fa-layer-group"></i></div>
+      <div>
+        <div class="kpi-value">{{ total_turmas }}</div>
+        <div class="kpi-label">Turmas Ativas</div>
+        <div class="kpi-label mt-1">Ocupação: <strong>{{ taxa_ocupacao }}%</strong></div>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-6 col-xl-3">
+    <div class="kpi-card">
+      <div class="kpi-icon green"><i class="fas fa-check-circle"></i></div>
+      <div>
+        <div class="kpi-value">{{ taxa_adimplencia }}%</div>
+        <div class="kpi-label">Taxa de Adimplência</div>
+        {% if variacao_receita >= 0 %}
+        <div class="kpi-badge up"><i class="fas fa-arrow-up"></i> {{ variacao_receita }}% vs mês ant.</div>
+        {% else %}
+        <div class="kpi-badge down"><i class="fas fa-arrow-down"></i> {{ variacao_receita }}% vs mês ant.</div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Financial KPIs -->
+<div class="row g-3 mb-4">
+  <div class="col-md-4">
+    <div class="kpi-card">
+      <div class="kpi-icon green"><i class="fas fa-dollar-sign"></i></div>
+      <div>
+        <div class="kpi-value">R$ {{ recebido_mes|floatformat:2 }}</div>
+        <div class="kpi-label">Recebido em {{ mes_nome }}</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="kpi-card">
+      <div class="kpi-icon blue"><i class="fas fa-file-invoice-dollar"></i></div>
+      <div>
+        <div class="kpi-value">R$ {{ total_a_receber|floatformat:2 }}</div>
+        <div class="kpi-label">Total a Receber no Mês</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="kpi-card">
+      <div class="kpi-icon red"><i class="fas fa-exclamation-triangle"></i></div>
+      <div>
+        <div class="kpi-value">{{ pendentes_vencidos }}</div>
+        <div class="kpi-label">Mensalidades Vencidas</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-4">
+  <!-- Turmas do dia -->
+  <div class="col-lg-6">
+    <div class="card-cai">
+      <div class="section-title"><i class="fas fa-swimming-pool me-2 text-primary"></i>Turmas de Hoje</div>
+      {% if turmas_hoje %}
+      <table class="table-cai">
+        <thead>
+          <tr>
+            <th>Turma</th>
+            <th>Horário</th>
+            <th>Professor</th>
+            <th>Alunos</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for t in turmas_hoje %}
+          <tr>
+            <td>
+              <a href="{% url 'detalhe_turma' t.pk %}" class="fw-semibold text-decoration-none" style="color:#1a6fb5;">
+                {{ t.nome }}
+              </a>
+              <br><small class="text-muted">{{ t.get_faixa_etaria_display }}</small>
+            </td>
+            <td>{{ t.horario_inicio|time:"H:i" }} – {{ t.horario_fim|time:"H:i" }}</td>
+            <td>{{ t.professor_responsavel.nome|truncatechars:18 }}</td>
+            <td>
+              <span class="fw-bold">{{ t.total_alunos }}</span>
+              <span class="text-muted">/{{ t.capacidade }}</span>
+              <div class="progress-cai mt-1" style="width:60px">
+                <div class="bar" style="width:{{ t.percentual_ocupacao }}%"></div>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+      <div class="text-center text-muted py-4">
+        <i class="fas fa-calendar-times fa-2x mb-2"></i>
+        <p class="mb-0">Nenhuma turma hoje.</p>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Mensalidades vencidas -->
+  <div class="col-lg-6">
+    <div class="card-cai">
+      <div class="d-flex align-items-center justify-content-between mb-3">
+        <div class="section-title mb-0"><i class="fas fa-exclamation-circle me-2 text-danger"></i>Mensalidades em Atraso</div>
+        <a href="{% url 'lista_mensalidades' %}?status=vencida" class="btn-topbar btn-primary-cai" style="font-size:12px;padding:5px 12px;">Ver todas</a>
+      </div>
+      {% if mensalidades_vencidas %}
+      <table class="table-cai">
+        <thead>
+          <tr><th>Aluno</th><th>Mês/Ano</th><th>Venceu</th><th>Valor</th></tr>
+        </thead>
+        <tbody>
+          {% for m in mensalidades_vencidas %}
+          <tr>
+            <td>
+              <a href="{% url 'perfil_aluno' m.aluno.pk %}" class="text-decoration-none fw-semibold" style="color:#2d3748;">
+                {{ m.aluno.nome|truncatechars:20 }}
+              </a>
+            </td>
+            <td>{{ m.get_mes_display }}/{{ m.ano }}</td>
+            <td>
+              <span class="chip chip-vencida">{{ m.dias_atraso }}d atraso</span>
+            </td>
+            <td class="fw-bold text-danger">R$ {{ m.valor_pendente|floatformat:2 }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+      <div class="text-center text-muted py-4">
+        <i class="fas fa-check-circle fa-2x mb-2 text-success"></i>
+        <p class="mb-0">Nenhuma mensalidade em atraso!</p>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Aniversariantes -->
+  <div class="col-lg-4">
+    <div class="card-cai">
+      <div class="section-title"><i class="fas fa-birthday-cake me-2" style="color:#f5c400;"></i>Aniversariantes do Mês</div>
+      {% if aniversariantes %}
+        {% for a in aniversariantes %}
+        <div class="d-flex align-items-center gap-3 mb-2 p-2 rounded" style="background:#fef9e7;">
+          <div class="avatar-circle" style="background:#f5c400;color:#0a3560;">
+            {{ a.nome|first|upper }}
+          </div>
+          <div class="flex-1">
+            <div class="fw-semibold" style="font-size:13.5px;">{{ a.nome }}</div>
+            <small class="text-muted">{{ a.data_nascimento|date:"d/m" }} — {{ a.idade }} anos</small>
+          </div>
+          <i class="fas fa-cake-candles" style="color:#f5c400;"></i>
+        </div>
+        {% endfor %}
+      {% else %}
+        <div class="text-center text-muted py-3">
+          <p class="mb-0 small">Nenhum aniversariante este mês.</p>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Vencimentos próximos -->
+  <div class="col-lg-4">
+    <div class="card-cai">
+      <div class="section-title"><i class="fas fa-clock me-2 text-warning"></i>Vencimentos Próximos</div>
+      {% if vencimentos_proximos %}
+        {% for v in vencimentos_proximos %}
+        <div class="d-flex align-items-center justify-content-between mb-2 p-2 rounded" style="background:#e8f4fd;">
+          <div>
+            <div class="fw-semibold" style="font-size:13px;">{{ v.aluno.nome|truncatechars:22 }}</div>
+            <small class="text-muted">Vence {{ v.data_vencimento|date:"d/m" }}</small>
+          </div>
+          <div class="fw-bold" style="color:#1a6fb5;font-size:13.5px;">R$ {{ v.valor_total|floatformat:2 }}</div>
+        </div>
+        {% endfor %}
+      {% else %}
+        <div class="text-center text-muted py-3">
+          <p class="mb-0 small">Nenhum vencimento nos próximos 5 dias.</p>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Pagamentos recentes -->
+  <div class="col-lg-4">
+    <div class="card-cai">
+      <div class="section-title"><i class="fas fa-receipt me-2 text-success"></i>Últimos Pagamentos</div>
+      {% if pagamentos_recentes %}
+        {% for p in pagamentos_recentes %}
+        <div class="d-flex align-items-center justify-content-between mb-2">
+          <div>
+            <div class="fw-semibold" style="font-size:13px;">{{ p.mensalidade.aluno.nome|truncatechars:20 }}</div>
+            <small class="text-muted">{{ p.data_pagamento|date:"d/m" }} via {{ p.get_forma_pagamento_display }}</small>
+          </div>
+          <span class="fw-bold text-success">R$ {{ p.valor|floatformat:2 }}</span>
+        </div>
+        {% endfor %}
+      {% else %}
+        <div class="text-center text-muted py-3">
+          <p class="mb-0 small">Nenhum pagamento recente.</p>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

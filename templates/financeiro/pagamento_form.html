@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% block title %}Registrar Pagamento — C.A.I{% endblock %}
+{% block page_title %}Registrar Pagamento{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-6">
+    <div class="card-cai mb-3" style="background:#eafaf1;border:1px solid #2ecc71;">
+      <div class="d-flex align-items-center justify-content-between">
+        <div>
+          <div class="fw-bold">{{ mensalidade.aluno.nome }}</div>
+          <div class="text-muted small">{{ mensalidade.get_mes_display }}/{{ mensalidade.ano }}</div>
+        </div>
+        <div class="text-end">
+          <div class="fw-bold text-danger">R$ {{ mensalidade.valor_pendente|floatformat:2 }}</div>
+          <div class="text-muted small">pendente</div>
+        </div>
+      </div>
+    </div>
+    <div class="card-cai">
+      <div class="section-title"><i class="fas fa-dollar-sign me-2 text-success"></i>Dados do Pagamento</div>
+      <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {% for field in form %}
+        <div class="mb-3">
+          <label class="form-label fw-semibold" style="font-size:13px;">{{ field.label }}{% if field.field.required %}<span class="text-danger">*</span>{% endif %}</label>
+          {{ field }}
+          {% if field.errors %}<div class="text-danger" style="font-size:12.5px;">{% for e in field.errors %}{{ e }}{% endfor %}</div>{% endif %}
+        </div>
+        {% endfor %}
+        <div class="d-flex gap-2 mt-4">
+          <button type="submit" class="btn btn-success px-4" style="border-radius:8px;"><i class="fas fa-check me-2"></i>Confirmar Pagamento</button>
+          <a href="{% url 'lista_mensalidades' %}" class="btn btn-outline-secondary px-4" style="border-radius:8px;">Cancelar</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

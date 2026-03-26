@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+{% block title %}{{ turma.nome }} — C.A.I{% endblock %}
+{% block page_title %}{{ turma.nome }}{% endblock %}
+{% block topbar_actions %}
+<a href="{% url 'matricular_aluno' turma.pk %}" class="btn-topbar btn-primary-cai"><i class="fas fa-user-plus"></i> Matricular</a>
+<a href="{% url 'editar_turma' turma.pk %}" class="btn-topbar" style="background:#f0f4f8;color:#4a5568;"><i class="fas fa-edit"></i> Editar</a>
+{% endblock %}
+{% block content %}
+<div class="row g-4">
+  <div class="col-lg-4">
+    <div class="card-cai mb-3">
+      <div class="section-title"><i class="fas fa-info-circle me-2 text-primary"></i>Informações</div>
+      <div class="mb-2"><strong>Faixa Etária:</strong> <span class="chip chip-pendente">{{ turma.get_faixa_etaria_display }}</span></div>
+      <div class="mb-2"><strong>Dia:</strong> {{ turma.get_dia_semana_display }}</div>
+      <div class="mb-2"><strong>Horário:</strong> {{ turma.horario_inicio|time:"H:i" }} – {{ turma.horario_fim|time:"H:i" }}</div>
+      <div class="mb-2"><strong>Status:</strong> <span class="chip chip-{{ turma.status }}">{{ turma.get_status_display }}</span></div>
+      <hr>
+      <div class="mb-2"><strong>Responsável:</strong> <a href="{% url 'perfil_professor' turma.professor_responsavel.pk %}" class="text-decoration-none" style="color:#1a6fb5;">{{ turma.professor_responsavel.nome }}</a></div>
+      {% if turma.professores_auxiliares.exists %}
+      <div><strong>Auxiliares:</strong>
+        {% for aux in turma.professores_auxiliares.all %}
+        <span class="badge bg-secondary ms-1">{{ aux.nome|truncatechars:15 }}</span>
+        {% endfor %}
+      </div>
+      {% endif %}
+    </div>
+    <div class="card-cai">
+      <div class="section-title"><i class="fas fa-chart-pie me-2 text-primary"></i>Ocupação</div>
+      <div class="kpi-value mb-1">{{ turma.total_alunos }}<span style="font-size:16px;color:#718096;">/{{ turma.capacidade }}</span></div>
+      <div class="progress-cai mb-2"><div class="bar" style="width:{{ turma.percentual_ocupacao }}%;height:10px;border-radius:10px;"></div></div>
+      <div style="font-size:13px;">
+        <strong>{{ turma.percentual_ocupacao }}%</strong> de ocupação<br>
+        <span class="text-muted">{{ turma.vagas_disponiveis }} vaga(s) livre(s)</span>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-8">
+    <div class="card-cai">
+      <div class="d-flex align-items-center justify-content-between mb-3">
+        <div class="section-title mb-0"><i class="fas fa-users me-2 text-primary"></i>Alunos Matriculados</div>
+        <a href="{% url 'matricular_aluno' turma.pk %}" class="btn-topbar btn-primary-cai" style="font-size:12px;padding:5px 12px;">
+          <i class="fas fa-plus me-1"></i>Matricular
+        </a>
+      </div>
+      {% if matriculas %}
+      <table class="table-cai">
+        <thead><tr><th>Aluno</th><th>Matrícula</th><th>Responsável</th><th>Mensalidade</th><th>Status</th><th></th></tr></thead>
+        <tbody>
+          {% for m in matriculas %}
+          <tr>
+            <td>
+              <div class="d-flex align-items-center gap-2">
+                <div class="avatar-circle" style="background:#e8f4fd;color:#1a6fb5;font-size:12px;width:32px;height:32px;">{{ m.aluno.nome|first|upper }}</div>
+                <div class="fw-semibold" style="font-size:13.5px;">{{ m.aluno.nome }}</div>
+              </div>
+            </td>
+            <td><code style="font-size:12px;">{{ m.aluno.matricula }}</code></td>
+            <td style="font-size:12.5px;">{{ m.aluno.responsavel_principal.nome|truncatechars:18 }}</td>
+            <td>R$ {{ m.valor_mensalidade|floatformat:2 }}</td>
+            <td><span class="chip chip-{{ m.status }}">{{ m.get_status_display }}</span></td>
+            <td><a href="{% url 'perfil_aluno' m.aluno.pk %}" class="btn btn-sm btn-outline-primary" style="border-radius:6px;font-size:11px;"><i class="fas fa-eye"></i></a></td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+      <div class="text-center text-muted py-5">
+        <i class="fas fa-users fa-2x mb-2"></i>
+        <p>Nenhum aluno matriculado.</p>
+        <a href="{% url 'matricular_aluno' turma.pk %}" class="btn btn-primary btn-sm" style="border-radius:8px;">Matricular primeiro aluno</a>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

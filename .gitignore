@@ -1,0 +1,46 @@
+.env
+.env.local
+.env.*.local
+
+*.pyc
+__pycache__/
+*.sqlite3
+*.db
+
+venv/
+env/
+ENV/
+
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+.DS_Store
+Thumbs.db
+
+*.egg-info/
+dist/
+build/
+
+.pytest_cache/
+htmlcov/
+.coverage
+
+staticfiles/
+media/
+
+# Logs
+*.log
+logs/
+
+# IDE
+.vscode
+.idea
+*.sublime-project
+*.sublime-workspace
+
+# OS
+.DS_Store
+.env.*.local
