@@ -1,0 +1,89 @@
+﻿{% extends 'base.html' %}
+{% block title %}Mensalidades — C.A.I{% endblock %}
+{% block page_title %}Mensalidades{% endblock %}
+{% block topbar_actions %}
+<a href="{% url 'financeiro' %}" class="btn-cai btn-cai-ghost"><i class="fas fa-chart-line"></i> Painel</a>
+{% endblock %}
+{% block content %}
+<div class="card-surface mb-4" style="padding:16px 22px;">
+  <form method="get" class="row g-3 align-items-end">
+    <div class="col-md-2">
+      <label class="form-label">Mês</label>
+      <select name="mes" class="form-select">{% for num, nome in meses_choices %}<option value="{{ num }}" {% if num == mes %}selected{% endif %}>{{ nome }}</option>{% endfor %}</select>
+    </div>
+    <div class="col-md-1">
+      <label class="form-label">Ano</label>
+      <input type="number" name="ano" value="{{ ano }}" class="form-control">
+    </div>
+    <div class="col-md-2">
+      <label class="form-label">Status</label>
+      <select name="status" class="form-select">
+        <option value="">Todos</option>
+        {% for val, nome in status_choices %}<option value="{{ val }}" {% if val == status %}selected{% endif %}>{{ nome }}</option>{% endfor %}
+      </select>
+    </div>
+    <div class="col-md-4">
+      <label class="form-label">Buscar aluno</label>
+      <input type="text" name="q" value="{{ q }}" class="form-control" placeholder="Nome do aluno...">
+    </div>
+    <div class="col-md-3">
+      <button type="submit" class="btn-cai btn-cai-primary w-100"><i class="fas fa-search me-1"></i>Filtrar</button>
+    </div>
+  </form>
+</div>
+
+<div class="card-surface">
+  <div class="table-responsive">
+    <table class="table-cai">
+      <thead>
+        <tr>
+          <th>Aluno</th>
+          <th>Competência</th>
+          <th>Valor Total</th>
+          <th>Pago</th>
+          <th>Pendente</th>
+          <th>Vencimento</th>
+          <th>Status</th>
+          <th style="text-align:right;">Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for m in mensalidades %}
+        <tr>
+          <td>
+            <a href="{% url 'perfil_aluno' m.aluno.pk %}" style="font-weight:600;color:#1e293b;text-decoration:none;">{{ m.aluno.nome }}</a>
+            <div><code>{{ m.aluno.matricula }}</code></div>
+          </td>
+          <td style="font-weight:600;color:#475569;">{{ m.get_mes_display }}/{{ m.ano }}</td>
+          <td>R$ {{ m.valor_total|floatformat:2 }}</td>
+          <td style="color:#16a34a;font-weight:600;">R$ {{ m.valor_pago|floatformat:2 }}</td>
+          <td style="{% if m.valor_pendente > 0 %}color:#dc2626;font-weight:700;{% else %}color:#94a3b8;{% endif %}">R$ {{ m.valor_pendente|floatformat:2 }}</td>
+          <td style="color:#475569;">
+            {{ m.data_vencimento|date:"d/m/Y" }}
+            {% if m.dias_atraso > 0 %}<br><span style="font-size:11px;color:#dc2626;font-weight:600;">{{ m.dias_atraso }}d atraso</span>{% endif %}
+          </td>
+          <td><span class="bdg bdg-{{ m.status }}">{{ m.get_status_display }}</span></td>
+          <td style="text-align:right;">
+            {% if m.status != 'paga' and m.status != 'cancelada' %}
+            <a href="{% url 'registrar_pagamento' m.pk %}" class="btn-cai btn-cai-success btn-cai-sm"><i class="fas fa-dollar-sign me-1"></i>Pagar</a>
+            {% else %}
+            <span style="font-size:12px;color:#94a3b8;">—</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="8">
+          <div class="empty-state">
+            <div class="empty-icon"><i class="fas fa-file-invoice-dollar"></i></div>
+            <div style="font-family:'Merriweather',serif;font-size:16px;color:#475569;">Nenhuma mensalidade encontrada</div>
+            <div style="font-size:13px;color:#94a3b8;margin-top:6px;">As cobranças são geradas automaticamente a partir dos planos das matrículas ativas.</div>
+          </div>
+        </td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
+
+

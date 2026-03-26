@@ -1,0 +1,26 @@
+﻿{% extends 'base.html' %}
+{% block title %}{{ titulo }} — C.A.I{% endblock %}
+{% block page_title %}{{ titulo }}{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-7">
+    <div class="card-surface">
+      <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {% for field in form %}
+        <div class="mb-3">
+          <label class="form-label">{{ field.label }}{% if field.field.required %}<span style="color:#dc2626;"> *</span>{% endif %}</label>
+          {{ field }}
+          {% if field.errors %}<div style="color:#dc2626;font-size:12.5px;margin-top:4px;">{% for e in field.errors %}{{ e }}{% endfor %}</div>{% endif %}
+        </div>
+        {% endfor %}
+        <div style="display:flex;gap:10px;margin-top:24px;padding-top:20px;border-top:1px solid #f1f5f9;">
+          <button type="submit" class="btn-cai btn-cai-primary"><i class="fas fa-save me-1"></i>Salvar</button>
+          <a href="javascript:history.back()" class="btn-cai btn-cai-ghost">Cancelar</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
+

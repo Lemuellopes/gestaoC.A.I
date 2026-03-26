@@ -1,0 +1,127 @@
+﻿{% extends 'base.html' %}
+{% block title %}{{ titulo }} — C.A.I{% endblock %}
+{% block page_title %}{{ titulo }}{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-7">
+    <div class="card-surface">
+      <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {% for field in form %}
+        {% if field.name != 'criar_matricula' and field.name != 'turma_matricula' and field.name != 'data_inicio_matricula' and field.name != 'plano_matricula' and field.name != 'frequencia_matricula' and field.name != 'dia_vencimento_matricula' and field.name != 'cobranca_personalizada' and field.name != 'valor_personalizado_matricula' and field.name != 'observacoes_matricula' %}
+        <div class="mb-3">
+          <label class="form-label">{{ field.label }}{% if field.field.required %}<span style="color:#dc2626;"> *</span>{% endif %}</label>
+          {{ field }}
+          {% if field.help_text %}<div style="font-size:12px;color:#64748b;margin-top:4px;">{{ field.help_text }}</div>{% endif %}
+          {% if field.errors %}<div style="color:#dc2626;font-size:12.5px;margin-top:4px;">{% for e in field.errors %}{{ e }}{% endfor %}</div>{% endif %}
+        </div>
+        {% endif %}
+        {% endfor %}
+
+        {% if form.criar_matricula %}
+        <div style="margin-top:18px;padding:16px;border:1px solid #dbeafe;border-radius:12px;background:#f8fbff;">
+          <div style="font-family:'Merriweather',serif;font-size:16px;color:#1e3a5f;margin-bottom:10px;">Matrícula Inicial</div>
+
+          <div class="mb-3">
+            <label class="form-label">{{ form.criar_matricula.label }}</label>
+            <div>{{ form.criar_matricula }}</div>
+            {% if form.criar_matricula.errors %}<div style="color:#dc2626;font-size:12.5px;margin-top:4px;">{% for e in form.criar_matricula.errors %}{{ e }}{% endfor %}</div>{% endif %}
+          </div>
+
+          <div id="matricula-section">
+            <div class="mb-3">
+              <label class="form-label">{{ form.turma_matricula.label }}<span style="color:#dc2626;"> *</span></label>
+              {{ form.turma_matricula }}
+              {% if form.turma_matricula.errors %}<div style="color:#dc2626;font-size:12.5px;margin-top:4px;">{% for e in form.turma_matricula.errors %}{{ e }}{% endfor %}</div>{% endif %}
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">{{ form.data_inicio_matricula.label }}<span style="color:#dc2626;"> *</span></label>
+              {{ form.data_inicio_matricula }}
+              {% if form.data_inicio_matricula.errors %}<div style="color:#dc2626;font-size:12.5px;margin-top:4px;">{% for e in form.data_inicio_matricula.errors %}{{ e }}{% endfor %}</div>{% endif %}
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">{{ form.plano_matricula.label }}<span style="color:#dc2626;"> *</span></label>
+              {{ form.plano_matricula }}
+              {% if form.plano_matricula.help_text %}<div style="font-size:12px;color:#64748b;margin-top:4px;">{{ form.plano_matricula.help_text }}</div>{% endif %}
+              {% if form.plano_matricula.errors %}<div style="color:#dc2626;font-size:12.5px;margin-top:4px;">{% for e in form.plano_matricula.errors %}{{ e }}{% endfor %}</div>{% endif %}
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">{{ form.frequencia_matricula.label }}<span style="color:#dc2626;"> *</span></label>
+              {{ form.frequencia_matricula }}
+              {% if form.frequencia_matricula.errors %}<div style="color:#dc2626;font-size:12.5px;margin-top:4px;">{% for e in form.frequencia_matricula.errors %}{{ e }}{% endfor %}</div>{% endif %}
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">{{ form.dia_vencimento_matricula.label }}<span style="color:#dc2626;"> *</span></label>
+              {{ form.dia_vencimento_matricula }}
+              {% if form.dia_vencimento_matricula.errors %}<div style="color:#dc2626;font-size:12.5px;margin-top:4px;">{% for e in form.dia_vencimento_matricula.errors %}{{ e }}{% endfor %}</div>{% endif %}
+            </div>
+
+            <div style="margin:14px 0 10px;padding:10px 12px;border-radius:10px;background:#fff7ed;border:1px solid #fed7aa;">
+              <div class="mb-2">
+                <label class="form-label" style="margin-bottom:0;">{{ form.cobranca_personalizada.label }}</label>
+                <div>{{ form.cobranca_personalizada }}</div>
+                <div style="font-size:12px;color:#9a3412;margin-top:4px;">Marque para informar valor com desconto ou bolsista.</div>
+              </div>
+
+              <div id="valor-personalizado-area">
+                <label class="form-label">{{ form.valor_personalizado_matricula.label }}</label>
+                {{ form.valor_personalizado_matricula }}
+                {% if form.valor_personalizado_matricula.help_text %}<div style="font-size:12px;color:#64748b;margin-top:4px;">{{ form.valor_personalizado_matricula.help_text }}</div>{% endif %}
+                {% if form.valor_personalizado_matricula.errors %}<div style="color:#dc2626;font-size:12.5px;margin-top:4px;">{% for e in form.valor_personalizado_matricula.errors %}{{ e }}{% endfor %}</div>{% endif %}
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">{{ form.observacoes_matricula.label }}</label>
+              {{ form.observacoes_matricula }}
+              {% if form.observacoes_matricula.errors %}<div style="color:#dc2626;font-size:12.5px;margin-top:4px;">{% for e in form.observacoes_matricula.errors %}{{ e }}{% endfor %}</div>{% endif %}
+            </div>
+          </div>
+        </div>
+        {% endif %}
+
+        <div style="display:flex;gap:10px;margin-top:24px;padding-top:20px;border-top:1px solid #f1f5f9;">
+          <button type="submit" class="btn-cai btn-cai-primary"><i class="fas fa-save me-1"></i>Salvar</button>
+          <a href="javascript:history.back()" class="btn-cai btn-cai-ghost">Cancelar</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+{% if form.criar_matricula %}
+<script>
+  (function () {
+    const criarMatricula = document.getElementById('id_criar_matricula');
+    const matriculaSection = document.getElementById('matricula-section');
+    const personalizado = document.getElementById('id_cobranca_personalizada');
+    const valorArea = document.getElementById('valor-personalizado-area');
+
+    function toggleMatricula() {
+      if (!criarMatricula || !matriculaSection) return;
+      matriculaSection.style.display = criarMatricula.checked ? 'block' : 'none';
+    }
+
+    function togglePersonalizado() {
+      if (!personalizado || !valorArea) return;
+      valorArea.style.display = personalizado.checked ? 'block' : 'none';
+    }
+
+    if (criarMatricula) {
+      criarMatricula.addEventListener('change', toggleMatricula);
+    }
+    if (personalizado) {
+      personalizado.addEventListener('change', togglePersonalizado);
+    }
+
+    toggleMatricula();
+    togglePersonalizado();
+  })();
+</script>
+{% endif %}
+{% endblock %}
+

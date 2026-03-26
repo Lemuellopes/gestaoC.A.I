@@ -1,0 +1,51 @@
+﻿{% extends 'base.html' %}
+{% block title %}Instrutores — C.A.I{% endblock %}
+{% block page_title %}Instrutores{% endblock %}
+{% block topbar_actions %}
+<a href="{% url 'novo_professor' %}" class="btn-cai btn-cai-primary"><i class="fas fa-plus"></i> Novo Instrutor</a>
+{% endblock %}
+{% block content %}
+<div class="row g-3 mb-4">
+  <div class="col-md-4">
+    <div class="kpi-card green"><div class="kpi-icon-wrap green"><i class="fas fa-user-check"></i></div><div><div class="kpi-value">{{ ativos }}</div><div class="kpi-label">Ativos</div></div></div>
+  </div>
+  <div class="col-md-4">
+    <div class="kpi-card gold"><div class="kpi-icon-wrap gold"><i class="fas fa-user-clock"></i></div><div><div class="kpi-value">{{ afastados }}</div><div class="kpi-label">Afastados</div></div></div>
+  </div>
+  <div class="col-md-4">
+    <div class="kpi-card red"><div class="kpi-icon-wrap red"><i class="fas fa-user-times"></i></div><div><div class="kpi-value">{{ desligados }}</div><div class="kpi-label">Desligados</div></div></div>
+  </div>
+</div>
+<div class="card-surface mb-4" style="padding:18px 22px;">
+  <form method="get" class="row g-3 align-items-end">
+    <div class="col-md-4"><label class="form-label">Buscar</label><input type="text" name="q" value="{{ q }}" class="form-control" placeholder="Nome, CPF, e-mail..."></div>
+    <div class="col-md-3"><label class="form-label">Status</label><select name="status" class="form-select"><option value="">Todos</option><option value="ativo" {% if status == 'ativo' %}selected{% endif %}>Ativo</option><option value="afastado" {% if status == 'afastado' %}selected{% endif %}>Afastado</option><option value="desligado" {% if status == 'desligado' %}selected{% endif %}>Desligado</option></select></div>
+    <div class="col-md-3"><label class="form-label">Especialidade</label><select name="especialidade" class="form-select"><option value="">Todas</option><option value="natacao_infantil" {% if especialidade == 'natacao_infantil' %}selected{% endif %}>Natação Infantil</option><option value="bebe_conforto" {% if especialidade == 'bebe_conforto' %}selected{% endif %}>Bebê Conforto</option><option value="auto_salvamento" {% if especialidade == 'auto_salvamento' %}selected{% endif %}>Auto Salvamento</option></select></div>
+    <div class="col-md-2"><button type="submit" class="btn-cai btn-cai-primary w-100"><i class="fas fa-search"></i> Filtrar</button></div>
+  </form>
+</div>
+<div class="card-surface">
+  <div class="table-responsive">
+    <table class="table-cai">
+      <thead><tr><th>Nome</th><th>Especialidade</th><th>Contato</th><th>Contrato</th><th>Tempo de Casa</th><th>Status</th><th style="text-align:right;">Ações</th></tr></thead>
+      <tbody>
+        {% for p in professores %}
+        <tr>
+          <td><div style="display:flex;align-items:center;gap:10px;"><div class="avatar av-sm av-teal">{{ p.nome|first|upper }}</div><div><div style="font-weight:600;">{{ p.nome }}</div><div style="font-size:12px;color:#94a3b8;">{{ p.registro_cref|default:"" }}</div></div></div></td>
+          <td><span class="bdg bdg-pendente">{{ p.get_especialidade_display }}</span></td>
+          <td><div style="font-size:13px;">{{ p.telefone }}</div><div style="font-size:12px;color:#94a3b8;">{{ p.email|truncatechars:22 }}</div></td>
+          <td style="color:#475569;font-size:13px;">{{ p.get_tipo_contrato_display }}</td>
+          <td style="font-size:13px;color:#475569;">{{ p.tempo_de_casa }}</td>
+          <td><span class="bdg bdg-{{ p.status }}">{{ p.get_status_display }}</span></td>
+          <td style="text-align:right;"><a href="{% url 'perfil_professor' p.pk %}" class="btn-cai btn-cai-ghost btn-cai-icon btn-cai-sm"><i class="fas fa-eye"></i></a> <a href="{% url 'editar_professor' p.pk %}" class="btn-cai btn-cai-ghost btn-cai-icon btn-cai-sm"><i class="fas fa-edit"></i></a></td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="7"><div class="empty-state"><div class="empty-icon"><i class="fas fa-search"></i></div><div style="font-family:'Merriweather',serif;font-size:16px;color:#475569;">Nenhum instrutor encontrado</div></div></td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
+
+

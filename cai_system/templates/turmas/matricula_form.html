@@ -1,0 +1,35 @@
+﻿{% extends 'base.html' %}
+{% block title %}Matricular Aluno — C.A.I{% endblock %}
+{% block page_title %}Matricular Aluno{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-6">
+    <div style="background:linear-gradient(135deg,#f0f7ff,#e0edff);border:1px solid #a8cff0;border-radius:14px;padding:16px 20px;margin-bottom:20px;display:flex;align-items:center;gap:14px;">
+      <div style="width:40px;height:40px;border-radius:10px;background:#1a4f8a;display:flex;align-items:center;justify-content:center;color:#fff;font-size:16px;flex-shrink:0;"><i class="fas fa-layer-group"></i></div>
+      <div>
+        <div style="font-weight:700;font-size:15px;color:#1e293b;">{{ turma.nome }}</div>
+        <div style="font-size:12.5px;color:#64748b;">{{ turma.get_dia_semana_display }} &middot; {{ turma.horario_inicio|time:"H:i" }}&ndash;{{ turma.horario_fim|time:"H:i" }} &middot; <strong>{{ turma.vagas_disponiveis }}</strong> vaga(s)</div>
+      </div>
+    </div>
+    <div class="card-surface">
+      <div class="section-hd"><div class="section-hd-icon"><i class="fas fa-user-plus"></i></div><div class="section-hd-title">Dados da Matrícula</div></div>
+      <form method="post">
+        {% csrf_token %}
+        {% for field in form %}
+        <div class="mb-3">
+          <label class="form-label">{{ field.label }}{% if field.field.required %}<span style="color:#dc2626;"> *</span>{% endif %}</label>
+          {{ field }}
+          {% if field.help_text %}<div style="font-size:12px;color:#64748b;margin-top:4px;">{{ field.help_text }}</div>{% endif %}
+          {% if field.errors %}<div style="color:#dc2626;font-size:12.5px;margin-top:4px;">{% for e in field.errors %}{{ e }}{% endfor %}</div>{% endif %}
+        </div>
+        {% endfor %}
+        <div style="display:flex;gap:10px;margin-top:24px;padding-top:20px;border-top:1px solid #f1f5f9;">
+          <button type="submit" class="btn-cai btn-cai-primary"><i class="fas fa-check me-1"></i>Confirmar</button>
+          <a href="{% url 'detalhe_turma' turma.pk %}" class="btn-cai btn-cai-ghost">Cancelar</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
+

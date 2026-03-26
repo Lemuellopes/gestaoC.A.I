@@ -1,0 +1,30 @@
+﻿{% extends 'base.html' %}
+{% block title %}Nova Mensalidade — C.A.I{% endblock %}
+{% block page_title %}Nova Mensalidade{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-6">
+    <div class="card-surface">
+      <div class="section-hd">
+        <div class="section-hd-icon" style="background:#f0fdf4;color:#16a34a;"><i class="fas fa-file-invoice-dollar"></i></div>
+        <div class="section-hd-title">Dados da Mensalidade</div>
+      </div>
+      <form method="post">
+        {% csrf_token %}
+        {% for field in form %}
+        <div class="mb-3">
+          <label class="form-label">{{ field.label }}{% if field.field.required %}<span style="color:#dc2626;"> *</span>{% endif %}</label>
+          {{ field }}
+          {% if field.errors %}<div style="color:#dc2626;font-size:12.5px;margin-top:4px;">{% for e in field.errors %}{{ e }}{% endfor %}</div>{% endif %}
+        </div>
+        {% endfor %}
+        <div style="display:flex;gap:10px;margin-top:24px;padding-top:20px;border-top:1px solid #f1f5f9;">
+          <button type="submit" class="btn-cai btn-cai-primary"><i class="fas fa-save me-1"></i>Salvar</button>
+          <a href="{% url 'lista_mensalidades' %}" class="btn-cai btn-cai-ghost">Cancelar</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
+

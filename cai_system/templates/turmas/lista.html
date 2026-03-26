@@ -1,0 +1,43 @@
+﻿{% extends 'base.html' %}
+{% block title %}Turmas — C.A.I{% endblock %}
+{% block page_title %}Turmas{% endblock %}
+{% block topbar_actions %}<a href="{% url 'nova_turma' %}" class="btn-cai btn-cai-primary"><i class="fas fa-plus"></i> Nova Turma</a>{% endblock %}
+{% block content %}
+<div class="card-surface mb-4" style="padding:18px 22px;">
+  <form method="get" class="row g-3 align-items-end">
+    <div class="col-md-4"><label class="form-label">Status</label><select name="status" class="form-select"><option value="">Todos</option><option value="ativa" {% if status == 'ativa' %}selected{% endif %}>Ativa</option><option value="inativa" {% if status == 'inativa' %}selected{% endif %}>Inativa</option></select></div>
+    <div class="col-md-4"><label class="form-label">Faixa Etária</label><select name="faixa" class="form-select"><option value="">Todas</option><option value="bebe" {% if faixa == 'bebe' %}selected{% endif %}>Bebê</option><option value="toddler" {% if faixa == 'toddler' %}selected{% endif %}>Pequenos</option><option value="kids" {% if faixa == 'kids' %}selected{% endif %}>Infantil (4-6)</option><option value="junior" {% if faixa == 'junior' %}selected{% endif %}>Infantil (6-8)</option></select></div>
+    <div class="col-md-4"><button type="submit" class="btn-cai btn-cai-primary w-100"><i class="fas fa-search"></i> Filtrar</button></div>
+  </form>
+</div>
+<div class="row g-3">
+  {% for turma in turmas %}
+  <div class="col-md-6 col-xl-4">
+    <div class="card-surface h-100" style="border-left:4px solid {% if turma.vagas_disponiveis == 0 %}#dc2626{% elif turma.vagas_disponiveis <= 2 %}#d97706{% else %}#2470c8{% endif %};">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;">
+        <div>
+          <div style="font-family:'Merriweather',serif;font-size:15px;font-weight:700;margin-bottom:4px;">{{ turma.nome }}</div>
+          <span class="bdg bdg-{{ turma.faixa_etaria }}">{{ turma.get_faixa_etaria_display }}</span>
+          <span class="bdg bdg-{{ turma.status }} ms-1">{{ turma.get_status_display }}</span>
+        </div>
+      </div>
+      <div style="font-size:13px;color:#475569;margin-bottom:4px;"><i class="fas fa-calendar me-1"></i>{{ turma.get_dia_semana_display }}</div>
+      <div style="font-size:13px;color:#475569;margin-bottom:4px;"><i class="fas fa-clock me-1"></i>{{ turma.horario_inicio|time:"H:i" }} – {{ turma.horario_fim|time:"H:i" }}</div>
+      <div style="font-size:13px;color:#475569;margin-bottom:14px;"><i class="fas fa-chalkboard-teacher me-1"></i>{{ turma.professor_responsavel.nome|truncatechars:25 }}</div>
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+        <div class="prog flex-1"><div class="prog-fill {% if turma.vagas_disponiveis == 0 %}danger{% elif turma.vagas_disponiveis <= 2 %}warning{% endif %}" style="width:{{ turma.percentual_ocupacao }}%"></div></div>
+        <span style="font-size:12.5px;font-weight:600;color:#1e293b;">{{ turma.total_alunos }}/{{ turma.capacidade }}</span>
+      </div>
+      <div style="font-size:12px;color:#94a3b8;margin-bottom:14px;">{% if turma.vagas_disponiveis == 0 %}<span style="color:#dc2626;font-weight:600;">Lotada</span>{% else %}{{ turma.vagas_disponiveis }} vaga(s) disponível(is){% endif %}</div>
+      <div style="display:flex;gap:8px;">
+        <a href="{% url 'detalhe_turma' turma.pk %}" class="btn-cai btn-cai-primary btn-cai-sm" style="flex:1;justify-content:center;"><i class="fas fa-eye me-1"></i>Ver Turma</a>
+        <a href="{% url 'editar_turma' turma.pk %}" class="btn-cai btn-cai-ghost btn-cai-icon btn-cai-sm"><i class="fas fa-edit"></i></a>
+      </div>
+    </div>
+  </div>
+  {% empty %}
+  <div class="col-12"><div class="card-surface"><div class="empty-state"><div class="empty-icon"><i class="fas fa-layer-group"></i></div><div style="font-family:'Merriweather',serif;font-size:16px;color:#475569;">Nenhuma turma encontrada</div></div></div></div>
+  {% endfor %}
+</div>
+{% endblock %}
+

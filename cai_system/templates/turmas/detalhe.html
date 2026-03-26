@@ -1,0 +1,60 @@
+﻿{% extends 'base.html' %}
+{% block title %}{{ turma.nome }} — C.A.I{% endblock %}
+{% block page_title %}{{ turma.nome }}{% endblock %}
+{% block topbar_actions %}
+<a href="{% url 'matricular_aluno' turma.pk %}" class="btn-cai btn-cai-primary"><i class="fas fa-user-plus"></i> Matricular</a>
+<a href="{% url 'editar_turma' turma.pk %}" class="btn-cai btn-cai-ghost"><i class="fas fa-edit"></i> Editar</a>
+{% endblock %}
+{% block content %}
+<div class="row g-4">
+  <div class="col-lg-4">
+    <div class="card-surface mb-4" style="border-top:4px solid #2470c8;">
+      <div class="section-hd"><div class="section-hd-icon"><i class="fas fa-info-circle"></i></div><div class="section-hd-title">Informações</div></div>
+      <div style="font-size:13.5px;line-height:2.2;">
+        <div><span style="color:#94a3b8;font-size:12px;">Faixa Etária</span><br><span class="bdg bdg-{{ turma.faixa_etaria }}">{{ turma.get_faixa_etaria_display }}</span></div>
+        <div><span style="color:#94a3b8;font-size:12px;">Dia / Horário</span><br><strong>{{ turma.get_dia_semana_display }}</strong> · {{ turma.horario_inicio|time:"H:i" }}–{{ turma.horario_fim|time:"H:i" }}</div>
+        <div><span style="color:#94a3b8;font-size:12px;">Status</span><br><span class="bdg bdg-{{ turma.status }}">{{ turma.get_status_display }}</span></div>
+        <div><span style="color:#94a3b8;font-size:12px;">Responsável</span><br><a href="{% url 'perfil_professor' turma.professor_responsavel.pk %}" style="font-weight:600;color:#1a4f8a;text-decoration:none;">{{ turma.professor_responsavel.nome }}</a></div>
+      </div>
+    </div>
+    <div class="card-surface">
+      <div class="section-hd"><div class="section-hd-icon"><i class="fas fa-chart-pie"></i></div><div class="section-hd-title">Ocupação</div></div>
+      <div style="font-family:'Merriweather',serif;font-size:32px;font-weight:700;color:#1a4f8a;margin-bottom:6px;">{{ turma.total_alunos }}<span style="font-size:18px;color:#94a3b8;">/{{ turma.capacidade }}</span></div>
+      <div class="prog mb-2" style="height:8px;"><div class="prog-fill {% if turma.vagas_disponiveis == 0 %}danger{% elif turma.vagas_disponiveis <= 2 %}warning{% endif %}" style="width:{{ turma.percentual_ocupacao }}%"></div></div>
+      <div style="font-size:13px;color:#475569;"><strong>{{ turma.percentual_ocupacao }}%</strong> ocupado · <span style="color:#94a3b8;">{{ turma.vagas_disponiveis }} vaga(s) livre(s)</span></div>
+    </div>
+  </div>
+  <div class="col-lg-8">
+    <div class="card-surface">
+      <div class="section-hd">
+        <div class="section-hd-icon"><i class="fas fa-users"></i></div>
+        <div class="section-hd-title">Alunos Matriculados</div>
+        <a href="{% url 'matricular_aluno' turma.pk %}" class="btn-cai btn-cai-primary btn-cai-sm ms-auto"><i class="fas fa-plus"></i> Matricular</a>
+      </div>
+      {% if matriculas %}
+      <div class="table-responsive">
+        <table class="table-cai">
+          <thead><tr><th>Aluno</th><th>Matrícula</th><th>Responsável</th><th>Mensalidade</th><th>Status</th><th></th></tr></thead>
+          <tbody>
+            {% for m in matriculas %}
+            <tr>
+              <td><div style="display:flex;align-items:center;gap:8px;"><div class="avatar av-sm av-ocean" style="width:30px;height:30px;font-size:12px;">{{ m.aluno.nome|first|upper }}</div><span style="font-weight:600;">{{ m.aluno.nome }}</span></div></td>
+              <td><code>{{ m.aluno.matricula }}</code></td>
+              <td style="font-size:13px;color:#475569;">{{ m.aluno.responsavel_principal.nome|truncatechars:18 }}</td>
+              <td style="font-weight:600;">R$ {{ m.valor_mensalidade|floatformat:2 }}</td>
+              <td><span class="bdg bdg-{{ m.status }}">{{ m.get_status_display }}</span></td>
+              <td><a href="{% url 'perfil_aluno' m.aluno.pk %}" class="btn-cai btn-cai-ghost btn-cai-icon btn-cai-sm"><i class="fas fa-eye"></i></a></td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <div class="empty-state"><div class="empty-icon"><i class="fas fa-users"></i></div><div style="font-family:'Merriweather',serif;font-size:16px;color:#475569;">Nenhum aluno matriculado</div><a href="{% url 'matricular_aluno' turma.pk %}" class="btn-cai btn-cai-primary" style="margin-top:16px;">Matricular primeiro aluno</a></div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+

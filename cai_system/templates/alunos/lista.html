@@ -1,0 +1,96 @@
+﻿{% extends 'base.html' %}
+{% block title %}Alunos — C.A.I{% endblock %}
+{% block page_title %}Alunos{% endblock %}
+{% block topbar_actions %}
+<a href="{% url 'novo_aluno' %}" class="btn-cai btn-cai-primary"><i class="fas fa-plus"></i> Novo Aluno</a>
+<a href="{% url 'novo_responsavel' %}" class="btn-cai btn-cai-ghost"><i class="fas fa-user-plus"></i> Responsável</a>
+{% endblock %}
+{% block content %}
+{% if aniversariantes %}
+<div style="background:linear-gradient(90deg,#fef7dc,#fffbeb);border:1px solid #f5cc52;border-radius:12px;padding:12px 18px;margin-bottom:20px;display:flex;align-items:center;gap:12px;">
+  <i class="fas fa-birthday-cake" style="color:#e8b320;font-size:18px;"></i>
+  <div>
+    <strong style="font-size:13.5px;color:#92400e;">Aniversariantes do mês:</strong>
+    {% for a in aniversariantes %}
+    <span style="display:inline-flex;align-items:center;gap:4px;background:#fff;border:1px solid #f5cc52;border-radius:20px;padding:2px 10px;font-size:12px;font-weight:600;color:#78350f;margin-left:6px;">
+      <i class="fas fa-star" style="font-size:9px;color:#e8b320;"></i>{{ a.nome }} ({{ a.data_nascimento|date:"d/m" }})
+    </span>
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
+
+<div class="card-surface mb-4" style="padding:18px 22px;">
+  <form method="get" class="row g-3 align-items-end">
+    <div class="col-md-4">
+      <label class="form-label">Buscar</label>
+      <input type="text" name="q" value="{{ q }}" class="form-control" placeholder="Nome, matrícula, responsável...">
+    </div>
+    <div class="col-md-2">
+      <label class="form-label">Status</label>
+      <select name="status" class="form-select">
+        <option value="">Todos</option>
+        <option value="ativo" {% if status == 'ativo' %}selected{% endif %}>Ativo</option>
+        <option value="inativo" {% if status == 'inativo' %}selected{% endif %}>Inativo</option>
+        <option value="trancado" {% if status == 'trancado' %}selected{% endif %}>Trancado</option>
+      </select>
+    </div>
+    <div class="col-md-3">
+      <label class="form-label">Faixa Etária</label>
+      <select name="faixa" class="form-select">
+        <option value="">Todas</option>
+        <option value="bebe" {% if faixa == 'bebe' %}selected{% endif %}>Bebê (0–2)</option>
+        <option value="toddler" {% if faixa == 'toddler' %}selected{% endif %}>Pequenos (2–4)</option>
+        <option value="kids" {% if faixa == 'kids' %}selected{% endif %}>Infantil (4–6)</option>
+        <option value="junior" {% if faixa == 'junior' %}selected{% endif %}>Infantil (6–8)</option>
+      </select>
+    </div>
+    <div class="col-md-3">
+      <button type="submit" class="btn-cai btn-cai-primary w-100"><i class="fas fa-search"></i> Filtrar</button>
+    </div>
+  </form>
+</div>
+
+<div class="card-surface">
+  <div class="section-hd">
+    <div class="section-hd-icon"><i class="fas fa-child"></i></div>
+    <div class="section-hd-title">{{ total }} aluno(s) encontrado(s)</div>
+  </div>
+  <div class="table-responsive">
+    <table class="table-cai">
+      <thead>
+        <tr><th>Aluno</th><th>Matrícula</th><th>Faixa</th><th>Idade</th><th>Responsável</th><th>Status</th><th style="text-align:right;">Ações</th></tr>
+      </thead>
+      <tbody>
+        {% for aluno in alunos %}
+        <tr>
+          <td>
+            <div style="display:flex;align-items:center;gap:10px;">
+              <div class="avatar av-sm av-ocean">{{ aluno.nome|first|upper }}</div>
+              <div>
+                <div style="font-weight:600;">{{ aluno.nome }}</div>
+                {% if aluno.aniversario_no_mes %}<div style="font-size:11px;color:#c9960c;"><i class="fas fa-birthday-cake"></i> Aniversário!</div>{% endif %}
+              </div>
+            </div>
+          </td>
+          <td><code>{{ aluno.matricula }}</code></td>
+          <td><span class="bdg bdg-{{ aluno.faixa_etaria }}">{{ aluno.get_faixa_etaria_display }}</span></td>
+          <td style="color:#475569;">{{ aluno.idade }} anos</td>
+          <td style="font-size:13px;color:#475569;">{{ aluno.responsavel_principal.nome|truncatechars:24 }}</td>
+          <td><span class="bdg bdg-{{ aluno.status }}">{{ aluno.get_status_display }}</span></td>
+          <td style="text-align:right;">
+            <a href="{% url 'perfil_aluno' aluno.pk %}" class="btn-cai btn-cai-ghost btn-cai-icon btn-cai-sm" title="Ver perfil"><i class="fas fa-eye"></i></a>
+            <a href="{% url 'editar_aluno' aluno.pk %}" class="btn-cai btn-cai-ghost btn-cai-icon btn-cai-sm" title="Editar"><i class="fas fa-edit"></i></a>
+          </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="7">
+          <div class="empty-state"><div class="empty-icon"><i class="fas fa-search"></i></div><div style="font-family:'Merriweather',serif;font-size:16px;color:#475569;">Nenhum aluno encontrado</div></div>
+        </td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
+
